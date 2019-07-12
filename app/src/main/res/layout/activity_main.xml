@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Connecting Myo"
+            android:textColor="@android:color/holo_orange_dark" />
+
+        <CheckBox
+            android:id="@+id/myo1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="Myo1 is not connected" />
+
+        <CheckBox
+            android:id="@+id/myo2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="Myo2 is not connected" />
+
+        <CheckBox
+            android:id="@+id/myo3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="Myo3 is not connected" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Data variation "
+            android:textColor="@android:color/holo_orange_dark"
+            android:textColorHighlight="@android:color/holo_red_dark" />
+
+        <CheckBox
+            android:id="@+id/checkAccel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onCheckboxClicked"
+            android:text="Record Accelerometer" />
+
+        <CheckBox
+            android:id="@+id/checkGyro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onCheckboxClicked"
+            android:text="Record Gyroscope" />
+
+        <CheckBox
+            android:id="@+id/checkQuaternion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onCheckboxClicked"
+            android:text="Record Quaternion" />
+
+        <CheckBox
+            android:id="@+id/checkOrientation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onCheckboxClicked"
+            android:text="Record Orientation" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Start Recording" />
+
+    </LinearLayout>
+
+</FrameLayout>
