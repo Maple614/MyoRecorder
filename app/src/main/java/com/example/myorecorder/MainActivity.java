@@ -1,9 +1,13 @@
 package com.example.myorecorder;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,7 +71,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
         // If you do not override an event, the default behavior is to do nothing.
-        private DeviceListener mListener = new AbstractDeviceListener() {
+
+    //permission 確認用
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+
+
+
+    private DeviceListener mListener = new AbstractDeviceListener() {
             @Override
             public void onAttach(Myo myo, long timestamp) {
                 // The object for a Myo is unique - in other words, it's safe to compare two Myo references to
@@ -254,6 +271,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
+
+            //permission確認
+            int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                // We don't have permission so prompt the user
+                ActivityCompat.requestPermissions(
+                        this,
+                        PERMISSIONS,
+                        REQUEST_EXTERNAL_STORAGE
+                );
+            }
+
+
             setContentView(R.layout.activity_main);
 
             //画面上のオブジェクトと変数をつなげる
