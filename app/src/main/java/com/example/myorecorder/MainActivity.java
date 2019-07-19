@@ -4,10 +4,12 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.content.ContextCompat;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thalmic.myo.AbstractDeviceListener;
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         OutputStreamWriter AccelOutputStreamWriter3, GyroOutputStreamWriter3, OrientOutputStreamWriter3, QuaterOutputStreamWriter3;
         BufferedWriter bwAccel3, bwGyro3, bwOrient3, bwQuater3;
 
+        long deltaTime=0;
+        private TextView delta_text;
         // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
         // If you do not override an event, the default behavior is to do nothing.
 
@@ -154,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onOrientationData(Myo myo, long timestamp, Quaternion rotation) {
                 //メソッド呼び出し時のタイムスタンプを記録
-                long time = System.currentTimeMillis();
+                long time = System.currentTimeMillis() + deltaTime;
                 // Calculate Euler angles (roll, pitch, and yaw) from the quaternion.
                 float roll = (float) Math.toDegrees(Quaternion.roll(rotation));
                 float pitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
@@ -213,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAccelerometerData(Myo myo, long timestamp, Vector3 accel) {
                 //メソッド呼び出し時のタイムスタンプを記録
-                long time = System.currentTimeMillis();
+                long time = System.currentTimeMillis() + deltaTime;
 
                 //加速度データの書き込み
                 if (isRecord && isExternalStorageWritable() && isAccel) {
@@ -241,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onGyroscopeData(Myo myo, long timestamp, Vector3 gyro) {
                 //メソッド呼び出し時のタイムスタンプを記録
-                long time = System.currentTimeMillis();
+                long time = System.currentTimeMillis() + deltaTime;
                 //ジャイロデータの書き込み
                 if (isRecord && isExternalStorageWritable() && isGyro) {
                     GyroData = time + "," + gyro.x() + "," + gyro.y() + "," + gyro.z() + "\n";
@@ -284,8 +289,15 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
 
-
             setContentView(R.layout.activity_main);
+
+            deltaTime("ntp.nict.jp",10000);
+            try{
+                Thread.sleep(5000); //3000ミリ秒Sleepする
+            }catch(InterruptedException e){}
+
+            delta_text = (TextView)findViewById(R.id.delta_text);
+            delta_text.setText(String.valueOf(deltaTime));
 
             //画面上のオブジェクトと変数をつなげる
             Myo1 = (CheckBox) findViewById(R.id.myo1);
@@ -603,4 +615,42 @@ public class MainActivity extends AppCompatActivity {
         private int identifyMyo(Myo myo) {
             return mKnownMyos.indexOf(myo) + 1;
         }
+
+
+    public void deltaTime(String url,int timeout) {
+        final String myUrl = url;
+        final int myTimeout = timeout;
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                long ntpTime = 0L;
+                long deviceTime = 0L;
+
+                SntpClient sntp = new SntpClient();
+                System.out.println(myUrl + "," + myTimeout);
+
+                if (sntp.requestTime(myUrl, myTimeout)) {
+                    ntpTime = sntp.getNtpTime() + SystemClock.elapsedRealtime() - sntp.getNtpTimeReference();
+                    deviceTime = System.currentTimeMillis();
+                }
+
+                System.out.println("NTP: " + ntpTime);
+                System.out.println("device: " + deviceTime);
+
+                deltaTime = ntpTime - deviceTime;
+                System.out.println("delta: " + deltaTime);
+
+
+                return String.valueOf(ntpTime);
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                // Log.d(TAG,result);
+            }
+        }.execute();
     }
+
+
+}
